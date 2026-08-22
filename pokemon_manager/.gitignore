@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+# Compilados
+dist/
+build/
+# Secretos: claves JWT, password BD
+.env
+.env.*
+!.env.example
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+*.log
