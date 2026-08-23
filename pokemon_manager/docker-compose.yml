@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: pokemon_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: pokemon_db
+      MYSQL_USER: pokemon_user
+      MYSQL_PASSWORD: pokemon_password
+    ports:
+      - "3306:3306"
