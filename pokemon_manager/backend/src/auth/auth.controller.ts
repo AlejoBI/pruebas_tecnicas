@@ -12,10 +12,12 @@
 // @Body()              → extrae y valida el body de la petición con el DTO
 // =============================================================================
 
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.services';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { UserId } from '../common/decorators/user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -29,5 +31,11 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard) // Protege la ruta con JWT
+  getProfile(@UserId() userId: number) {
+    return this.authService.getProfile(userId);
   }
 }

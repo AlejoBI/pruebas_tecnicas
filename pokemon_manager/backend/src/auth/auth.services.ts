@@ -33,6 +33,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserService } from '../users/users.services';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { User } from '../users/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -40,6 +41,11 @@ export class AuthService {
     private readonly usersService: UserService, // Inyectado por NestJS
     private readonly jwtService: JwtService, // Inyectado por NestJS
   ) {}
+
+  private sanitizeUser(user: User) {
+    const { password: _, ...result } = user; // _ = "sé que existe pero no lo uso"
+    return result;
+  }
 
   async register(dto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(dto.email);
@@ -54,8 +60,13 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const { password: _, ...result } = newUser; // _ = "sé que existe pero no lo uso"
-    return result;
+    const result = this.sanitizeUser(newUser);
+    const token = this.jwtService.sign({
+      sub: newUser.id,
+      email: newUser.email,
+    });
+
+    return { user: result, access_token: token };
   }
 
   async login(dto: LoginDto) {
@@ -72,9 +83,24 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, email: user.email };
+    const result = this.sanitizeUser(user);
+    const token = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      user: result,
+      access_token: token,
     };
+  }
+
+  async getProfile(userId: number) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    return this.sanitizeUser(user);
   }
 }
