@@ -5,6 +5,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import PokemonBrowserPage from "./pages/pokemon/PokemonBrowserPage";
 import FavoritesPage from "./pages/pokemon/FavoritesPage";
+import PokemonDetailPage from "./pages/pokemon/PokemonDetailPage";
 
 const App = () => {
   return (
@@ -30,6 +31,15 @@ const App = () => {
             <ProtectedRoute>
               <Navbar />
               <FavoritesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pokemon/:id"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <PokemonDetailPage />
             </ProtectedRoute>
           }
         />

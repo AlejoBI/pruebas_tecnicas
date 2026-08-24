@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { getPokemonList } from "../../api/pokemon";
 import client from "../../api/client";
@@ -31,55 +31,61 @@ const PokemonBrowserPage = () => {
       .catch(() => {});
   }, [token]);
 
-  const toggleFavorite = async (pokemonApiId: number) => {
-    if (favorites.has(pokemonApiId)) {
-      try {
-        const res = await client.get("/pokemon");
-        const fav = res.data.items.find(
-          (f: Favorite) => f.pokemonApiId === pokemonApiId,
-        );
-        if (fav) {
-          await client.delete(`/pokemon/${fav.id}`);
-          setFavorites((prev) => {
-            const next = new Set(prev);
-            next.delete(pokemonApiId);
-            return next;
-          });
+  const toggleFavorite = useCallback(
+    async (pokemonApiId: number) => {
+      if (favorites.has(pokemonApiId)) {
+        try {
+          const res = await client.get("/pokemon");
+          const fav = res.data.items.find(
+            (f: Favorite) => f.pokemonApiId === pokemonApiId,
+          );
+          if (fav) {
+            await client.delete(`/pokemon/${fav.id}`);
+            setFavorites((prev) => {
+              const next = new Set(prev);
+              next.delete(pokemonApiId);
+              return next;
+            });
+          }
+        } catch {
+          setError("Error al eliminar de favoritos");
         }
-      } catch {
-        setError("Error al eliminar de favoritos");
+      } else {
+        try {
+          await client.post("/pokemon", { pokemonApiId });
+          setFavorites((prev) => new Set(prev).add(pokemonApiId));
+        } catch {
+          setError("Error al agregar a favoritos");
+        }
       }
-    } else {
-      try {
-        await client.post("/pokemon", { pokemonApiId });
-        setFavorites((prev) => new Set(prev).add(pokemonApiId));
-      } catch {
-        setError("Error al agregar a favoritos");
-      }
-    }
-  };
+    },
+    [favorites],
+  );
 
-  const filtered = pokemon.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()),
+  const filtered = useMemo(
+    () =>
+      pokemon.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [pokemon, search],
   );
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-white mb-6">Pokédex</h1>
+      <h1 className="text-2xl font-bold mb-4">Pokédex</h1>
+
       <input
         type="text"
         placeholder="Buscar Pokémon..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full max-w-md bg-gray-800 text-white px-4 py-3 rounded mb-6 outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 rounded px-3 py-2 mb-4 w-full max-w-sm"
       />
-      {error && (
-        <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
       {loading ? (
-        <p className="text-white">Cargando...</p>
+        <p>Cargando...</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((p) => (
@@ -95,18 +101,19 @@ const PokemonBrowserPage = () => {
           ))}
         </div>
       )}
+
       <div className="flex justify-center gap-4 mt-6">
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={page === 0}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="border border-gray-300 rounded px-4 py-2 disabled:opacity-50"
         >
           ← Anterior
         </button>
-        <span className="text-white self-center">Página {page + 1}</span>
+        <span className="self-center">Página {page + 1}</span>
         <button
           onClick={() => setPage((p) => p + 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded"
+          className="border border-gray-300 rounded px-4 py-2"
         >
           Siguiente →
         </button>
@@ -114,4 +121,5 @@ const PokemonBrowserPage = () => {
     </div>
   );
 };
+
 export default PokemonBrowserPage;

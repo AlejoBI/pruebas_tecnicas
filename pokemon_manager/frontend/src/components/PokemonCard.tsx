@@ -1,5 +1,6 @@
 import { getPokemonDetail } from "../api/pokemon";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
+import { Link } from "react-router-dom";
 
 interface PokemonCardProps {
   name: string;
@@ -8,31 +9,35 @@ interface PokemonCardProps {
   onToggleFavorite: (pokemonApiId: number) => void;
 }
 
-export function PokemonCard({
-  name,
-  isFavorite,
-  onToggleFavorite,
-}: PokemonCardProps) {
-  const [sprite, setSprite] = useState("");
-  const [pokemonId, setPokemonId] = useState(0);
+export const PokemonCard = memo(
+  ({ name, isFavorite, onToggleFavorite }: PokemonCardProps) => {
+    const [sprite, setSprite] = useState("");
+    const [pokemonId, setPokemonId] = useState(0);
 
-  useEffect(() => {
-    getPokemonDetail(name).then((data) => {
-      setSprite(data.sprites.front_default);
-      setPokemonId(data.id);
-    });
-  }, [name]);
+    useEffect(() => {
+      getPokemonDetail(name).then((data) => {
+        setSprite(data.sprites.front_default);
+        setPokemonId(data.id);
+      });
+    }, [name]);
 
-  return (
-    <div className="bg-gray-900 rounded-lg p-4 flex flex-col items-center gap-2">
-      <img src={sprite} alt={name} className="w-24 h-24" />
-      <p className="text-white capitalize">{name}</p>
-      <button
-        onClick={() => onToggleFavorite(pokemonId)}
-        className={`text-2xl ${isFavorite ? "text-red-500" : "text-gray-500"}`}
+    return (
+      <Link
+        to={`/pokemon/${pokemonId}`}
+        className="block border border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50"
       >
-        {isFavorite ? "♥" : "♡"}
-      </button>
-    </div>
-  );
-}
+        <img src={sprite} alt={name} className="w-16 h-16 mx-auto" />
+        <p className="capitalize mt-2">{name}</p>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            onToggleFavorite(pokemonId);
+          }}
+          className={`text-2xl mt-2 ${isFavorite ? "text-red-500" : "text-gray-400"}`}
+        >
+          {isFavorite ? "♥" : "♡"}
+        </button>
+      </Link>
+    );
+  },
+);

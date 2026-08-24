@@ -15,6 +15,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      NODE_ENV: development
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: pokemon_user

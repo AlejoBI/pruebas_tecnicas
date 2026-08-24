@@ -35,24 +35,20 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="w-full max-w-md bg-gray-900 p-8 rounded-lg">
-        <h1 className="text-2xl font-bold text-white text-center mb-6">
-          Pokémon Manager
-        </h1>
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <div className="flex justify-center items-center h-screen">
+      <div className="w-80 p-6 border border-gray-300 rounded-lg">
+        <h1 className="text-xl font-bold text-center mb-4">Pokémon Manager</h1>
+
+        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-gray-800 text-white px-4 py-3 rounded outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 rounded px-3 py-2"
           />
           <input
             type="password"
@@ -60,21 +56,19 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="bg-gray-800 text-white px-4 py-3 rounded outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 rounded px-3 py-2"
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700 disabled:opacity-50"
+            className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:opacity-50"
           >
             {loading ? "Cargando..." : "Iniciar sesión"}
           </button>
         </form>
-        <p className="text-gray-400 text-center mt-4">
-          ¿No tienes cuenta?{" "}
-          <Link to="/register" className="text-blue-400 hover:underline">
-            Regístrate
-          </Link>
+
+        <p className="text-center text-sm mt-4">
+          ¿No tienes cuenta? <Link to="/register" className="text-blue-500 hover:underline">Regístrate</Link>
         </p>
       </div>
     </div>

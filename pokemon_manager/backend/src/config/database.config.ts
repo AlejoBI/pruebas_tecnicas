@@ -18,9 +18,10 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 export const getDatabaseConfig = (): TypeOrmModuleOptions => ({
   type: 'mysql',
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT!, 10), // ! = "confía, no es undefined" (la validación ya lo garantizó)
+  port: parseInt(process.env.DB_PORT!, 10),
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  autoLoadEntities: true, // Detecta automáticamente las entities registradas en otros módulos
+  autoLoadEntities: true,
+  synchronize: process.env.NODE_ENV !== 'production', // true en dev, false en prod
 });
