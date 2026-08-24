@@ -9,3 +9,26 @@ services:
       MYSQL_PASSWORD: pokemon_password
     ports:
       - "3306:3306"
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: pokemon_user
+      DB_PASS: pokemon_password
+      DB_NAME: pokemon_db
+      JWT_SECRET: ${JWT_SECRET:-pokesecret123}
+      JWT_EXPIRES: 3600
+      CORS_ORIGIN: http://localhost
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
