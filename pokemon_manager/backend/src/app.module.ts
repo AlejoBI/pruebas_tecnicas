@@ -14,12 +14,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
 import { validate } from './config/env.validation';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { PokemonModule } from './pokemon/pokemon.module';
 
 @Module({
   imports: [
@@ -38,9 +40,18 @@ import { UsersModule } from './users/users.module';
       useFactory: () => getDatabaseConfig(),
     }),
 
+    // CacheModule: habilita el sistema de caché de NestJS.
+    // Por defecto usa almacenamiento en memoria (no necesita Redis).
+    // ttl: tiempo de vida en milisegundos (300000 = 5 minutos).
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300000,
+    }),
+
     // Módulos de funcionalidad
     AuthModule, // POST /auth/register, POST /auth/login
-    UsersModule, // Service para buscar/crear usuarios en la BD
+    UsersModule, // Service para buscar/crear usuarios en la <BD></BD>
+    PokemonModule, // GET /pokemon/:id, GET /pokemon?name=...
   ],
   controllers: [AppController],
   providers: [AppService],

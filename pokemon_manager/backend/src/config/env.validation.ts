@@ -19,19 +19,15 @@
 // SÍ van a existir después de la validación, confía en mí".
 // =============================================================================
 
-import { plainToInstance } from 'class-transformer';
-import {
-  IsString,
-  IsNumber,
-  IsNotEmpty,
-  validateSync,
-} from 'class-validator';
+import { plainToInstance, Transform } from 'class-transformer';
+import { IsString, IsNumber, IsNotEmpty, validateSync } from 'class-validator';
 
 class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   DB_HOST!: string;
 
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   DB_PORT!: number;
 
@@ -51,6 +47,7 @@ class EnvironmentVariables {
   @IsNotEmpty()
   JWT_SECRET!: string;
 
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   JWT_EXPIRES!: number;
 }
